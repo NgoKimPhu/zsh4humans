@@ -2,8 +2,10 @@ local -i cursor=CURSOR
 "$@"
 emulate -L zsh
 if (( CURSOR > cursor )); then
+  zle copy-region-as-kill "$BUFFER[cursor+1,CURSOR]"
   BUFFER[cursor+1,CURSOR]=
   CURSOR=$cursor
 elif (( CURSOR < cursor )); then
+  zle copy-region-as-kill "$BUFFER[CURSOR+1,cursor]"
   BUFFER[CURSOR+1,cursor]=
 fi
