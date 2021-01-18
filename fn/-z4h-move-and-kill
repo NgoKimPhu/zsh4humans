@@ -1,11 +1,23 @@
-local -i cursor=CURSOR
+local -i cursor=CURSOR backkill=0
+local cutbuffer
 "$@"
 emulate -L zsh
 if (( CURSOR > cursor )); then
-  zle copy-region-as-kill "$BUFFER[cursor+1,CURSOR]"
+  cutbuffer=$BUFFER[cursor+1,CURSOR]
   BUFFER[cursor+1,CURSOR]=
   CURSOR=$cursor
 elif (( CURSOR < cursor )); then
-  zle copy-region-as-kill "$BUFFER[CURSOR+1,cursor]"
+  cutbuffer=$BUFFER[CURSOR+1,cursor]
+  backkill=1
   BUFFER[CURSOR+1,cursor]=
 fi
+if [[ "$LASTWIDGET" =~ 'kill-' ]]; then
+  if (( backkill )); then
+    CUTBUFFER=$cutbuffer$CUTBUFFER
+  else
+    CUTBUFFER+=$cutbuffer
+  fi
+else
+  zle copy-region-as-kill "$cutbuffer"
+fi
+zle -f kill
